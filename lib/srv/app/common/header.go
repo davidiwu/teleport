@@ -34,6 +34,7 @@ const (
 var ReservedHeaders = append([]string{teleport.AppJWTHeader,
 	teleport.AppCFHeader,
 	XForwardedSSL,
+	"X-Forwarded-Token",
 },
 	forward.XHeaders...,
 )

@@ -690,6 +690,10 @@ func (p *Pack) startRootAppServers(t *testing.T, count int, extraApps []service.
 							Name:  forward.XForwardedPort,
 							Value: "rewritten-x-forwarded-port-header",
 						},
+						{
+							Name:  "X-Forwarded-Token",
+							Value: "rewritten-x-forwarded-token-header",
+						},
 						// Make sure we can insert JWT token in custom header.
 						{
 							Name:  "X-JWT",
@@ -826,6 +830,10 @@ func (p *Pack) startLeafAppServers(t *testing.T, count int, extraApps []service.
 						{
 							Name:  forward.XForwardedPort,
 							Value: "rewritten-x-forwarded-port-header",
+						},
+						{
+							Name:  "X-Forwarded-Token",
+							Value: "rewritten-x-forwarded-token-header",
 						},
 					},
 				},

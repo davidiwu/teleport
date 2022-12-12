@@ -49,6 +49,7 @@ type transportConfig struct {
 	ws           types.WebSession
 	clusterName  string
 	log          *logrus.Entry
+	onetimeToken string
 }
 
 // Check validates configuration.

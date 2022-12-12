@@ -167,6 +167,7 @@ func (s *Server) withJWTTokenForwarder(ctx context.Context, sess *sessionChunk, 
 			traits:       traits,
 			log:          s.log,
 			user:         identity.Username,
+			onetimeToken: identity.RouteToApp.AWSRoleARN,
 		})
 	if err != nil {
 		return trace.Wrap(err)

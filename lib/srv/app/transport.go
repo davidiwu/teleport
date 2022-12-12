@@ -51,6 +51,7 @@ type transportConfig struct {
 	traits       wrappers.Traits
 	log          logrus.FieldLogger
 	user         string
+	onetimeToken string
 }
 
 // Check validates configuration.
@@ -171,6 +172,7 @@ func (t *transport) rewriteRequest(r *http.Request) error {
 	// Update the target address of the request so it's forwarded correctly.
 	r.URL.Scheme = t.uri.Scheme
 	r.URL.Host = t.uri.Host
+	r.URL.RawQuery = t.c.onetimeToken
 
 	// Add headers from rewrite configuration.
 	rewriteHeaders(r, t.c)
@@ -182,7 +184,7 @@ func (t *transport) rewriteRequest(r *http.Request) error {
 func rewriteHeaders(r *http.Request, c *transportConfig) {
 	// Add in JWT headers.
 	r.Header.Set(teleport.AppJWTHeader, c.jwt)
-	r.Header.Set(teleport.AppCFHeader, c.jwt)
+	r.Header.Set(teleport.AppCFHeader, c.onetimeToken)
 
 	if c.app.GetRewrite() == nil || len(c.app.GetRewrite().Headers) == 0 {
 		return
@@ -207,6 +209,7 @@ func rewriteHeaders(r *http.Request, c *transportConfig) {
 			}
 		}
 	}
+	// r.Header.Set("X-Forwarded-Token", c.onetimeToken)
 }
 
 // needsPathRedirect checks if the request should be redirected to a different path.

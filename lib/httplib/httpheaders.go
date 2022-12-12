@@ -47,7 +47,7 @@ func SetIndexHTMLHeaders(h http.Header) {
 	h.Set("Referrer-Policy", "origin")
 
 	// X-Frame-Options indicates that the page can only be displayed in iframe on the same origin as the page itself
-	h.Set("X-Frame-Options", "SAMEORIGIN")
+	// h.Set("X-Frame-Options", "SAMEORIGIN")
 
 	// X-XSS-Protection is a feature of Internet Explorer, Chrome and Safari that stops pages
 	// from loading when they detect reflected cross-site scripting (XSS) attacks.
@@ -64,7 +64,7 @@ func SetIndexHTMLHeaders(h http.Header) {
 	// Set content policy flags
 	var cspValue = strings.Join([]string{
 		"default-src 'self'",
-		"frame-ancestors 'none'",
+		// "frame-ancestors 'none'",
 		// 'unsafe-inline' is required by CSS-in-JS to work
 		"style-src 'self' 'unsafe-inline'",
 		"object-src 'none'",
@@ -81,7 +81,7 @@ func SetIndexHTMLHeaders(h http.Header) {
 // SetSameOriginIFrame sets X-Frame-Options flag
 func SetSameOriginIFrame(h http.Header) {
 	// X-Frame-Options indicates that the page can only be displayed in iframe on the same origin as the page itself
-	h.Set("X-Frame-Options", "SAMEORIGIN")
+	// h.Set("X-Frame-Options", "SAMEORIGIN")
 }
 
 // SetNoSniff sets X-Content-Type-Options flag

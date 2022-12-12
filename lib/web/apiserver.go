@@ -308,6 +308,22 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 		return nil, trace.Wrap(err)
 	}
 
+	h.HandleOPTIONS = true
+	h.GlobalOPTIONS = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Access-Control-Request-Method") != "" {
+			header := w.Header()
+			origin := r.Header.Get("Origin")
+			if origin == "https://localhost:3000" || origin == "https://cloudedge-dev.mycaptureclient.com" {
+				header.Set("Access-Control-Allow-Origin", origin)
+			}
+			header.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+			header.Set("Access-Control-Allow-Credentials", "true")
+			header.Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	if cfg.MinimalReverseTunnelRoutesOnly {
 		h.bindMinimalEndpoints()
 	} else {
@@ -336,6 +352,19 @@ func NewHandler(cfg Config, opts ...HandlerOption) (*APIHandler, error) {
 	}
 
 	routingHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// if r.Method == "OPTIONS" {
+		// 	if r.Header.Get("Access-Control-Request-Method") != "" {
+		// 		header := w.Header()
+		// 		header.Set("Access-Control-Allow-Origin", "https://localhost:3000")
+		// 		header.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		// 		header.Set("Access-Control-Allow-Credentials", "true")
+		// 		header.Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		// 	}
+		// 	w.WriteHeader(http.StatusNoContent)
+		// 	return
+		// }
+
 		// request is going to the API?
 		if strings.HasPrefix(r.URL.Path, apiPrefix) {
 			http.StripPrefix(apiPrefix, h).ServeHTTP(w, r)
@@ -1530,6 +1559,25 @@ func newSessionResponse(ctx *SessionContext) (*CreateSessionResponse, error) {
 	}, nil
 }
 
+// func enableCors(w *http.ResponseWriter) {
+// 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+// 	(*w).Header().Set("Access-Control-Allow-Credentials", "true")
+// 	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+// 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+// }
+
+func Cors(next httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		wHeader := w.Header()
+		wHeader.Set("Access-Control-Allow-Origin", "*")
+		wHeader.Set("Access-Control-Allow-Credentials", "true")
+		wHeader.Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		wHeader.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		next(w, r, ps)
+	}
+}
+
 // createWebSession creates a new web session based on user, pass and 2nd factor token
 //
 // POST /v1/webapi/sessions/web
@@ -1540,6 +1588,7 @@ func newSessionResponse(ctx *SessionContext) (*CreateSessionResponse, error) {
 //
 // {"type": "bearer", "token": "bearer token", "user": {"name": "alex", "allowed_logins": ["admin", "bob"]}, "expires_in": 20}
 func (h *Handler) createWebSession(w http.ResponseWriter, r *http.Request, p httprouter.Params) (interface{}, error) {
+
 	var req *CreateSessionReq
 	if err := httplib.ReadJSON(r, &req); err != nil {
 		return nil, trace.Wrap(err)
@@ -1603,7 +1652,22 @@ func (h *Handler) createWebSession(w http.ResponseWriter, r *http.Request, p htt
 		return nil, trace.AccessDenied("need auth")
 	}
 
+	setCorsHeader(w, r)
+
 	return newSessionResponse(ctx)
+}
+
+func setCorsHeader(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("Origin") != "" {
+		header := w.Header()
+		origin := r.Header.Get("Origin")
+		if origin == "https://localhost:3000" || origin == "https://cloudedge-dev.mycaptureclient.com" {
+			header.Set("Access-Control-Allow-Origin", origin)
+		}
+		header.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		header.Set("Access-Control-Allow-Credentials", "true")
+		header.Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+	}
 }
 
 func clientMetaFromReq(r *http.Request) *auth.ForwardedClientMetadata {

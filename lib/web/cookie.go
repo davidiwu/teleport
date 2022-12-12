@@ -60,6 +60,7 @@ func SetSessionCookie(w http.ResponseWriter, user, sid string) error {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(w, c)
 	return nil
@@ -72,6 +73,7 @@ func ClearSession(w http.ResponseWriter) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 }
 

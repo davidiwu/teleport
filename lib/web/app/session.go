@@ -95,6 +95,7 @@ func (h *Handler) newSession(ctx context.Context, ws types.WebSession) (*session
 		servers:      servers,
 		ws:           ws,
 		clusterName:  h.clusterName,
+		onetimeToken: identity.RouteToApp.AWSRoleARN,
 	})
 	if err != nil {
 		return nil, trace.Wrap(err)

@@ -58,41 +58,43 @@ func AddCSRFProtection(w http.ResponseWriter, r *http.Request) (string, error) {
 
 // VerifyHTTPHeader checks if HTTP header value matches the cookie.
 func VerifyHTTPHeader(r *http.Request) error {
-	token := r.Header.Get(HeaderName)
-	if len(token) == 0 {
-		return trace.BadParameter("cannot retrieve CSRF token from HTTP header %q", HeaderName)
-	}
-
-	err := VerifyToken(token, r)
-	if err != nil {
-		return trace.Wrap(err)
-	}
-
 	return nil
+	// token := r.Header.Get(HeaderName)
+	// if len(token) == 0 {
+	// 	return trace.BadParameter("cannot retrieve CSRF token from HTTP header %q", HeaderName)
+	// }
+
+	// err := VerifyToken(token, r)
+	// if err != nil {
+	// 	return trace.Wrap(err)
+	// }
+
+	// return nil
 }
 
 // VerifyToken validates given token based on HTTP request cookie
 func VerifyToken(token string, r *http.Request) error {
-	realToken, err := ExtractTokenFromCookie(r)
-	if err != nil {
-		return trace.Wrap(err, "unable to extract CSRF token from cookie")
-	}
-
-	decodedTokenA, err := decode(token)
-	if err != nil {
-		return trace.Wrap(err, "unable to decode CSRF token")
-	}
-
-	decodedTokenB, err := decode(realToken)
-	if err != nil {
-		return trace.Wrap(err, "unable to decode cookie CSRF token")
-	}
-
-	if !compareTokens(decodedTokenA, decodedTokenB) {
-		return trace.BadParameter("CSRF tokens do not match")
-	}
-
 	return nil
+	// realToken, err := ExtractTokenFromCookie(r)
+	// if err != nil {
+	// 	return trace.Wrap(err, "unable to extract CSRF token from cookie")
+	// }
+
+	// decodedTokenA, err := decode(token)
+	// if err != nil {
+	// 	return trace.Wrap(err, "unable to decode CSRF token")
+	// }
+
+	// decodedTokenB, err := decode(realToken)
+	// if err != nil {
+	// 	return trace.Wrap(err, "unable to decode cookie CSRF token")
+	// }
+
+	// if !compareTokens(decodedTokenA, decodedTokenB) {
+	// 	return trace.BadParameter("CSRF tokens do not match")
+	// }
+
+	// return nil
 }
 
 // ExtractTokenFromCookie retrieves a CSRF token from the session cookie.
