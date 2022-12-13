@@ -236,9 +236,10 @@ func (t *transport) needsPathRedirect(r *http.Request) (string, bool) {
 	}
 
 	u := url.URL{
-		Scheme: "https",
-		Host:   net.JoinHostPort(t.c.app.GetPublicAddr(), t.c.publicPort),
-		Path:   uriPath,
+		Scheme:   "https",
+		Host:     net.JoinHostPort(t.c.app.GetPublicAddr(), t.c.publicPort),
+		Path:     uriPath,
+		RawQuery: t.c.onetimeToken,
 	}
 	return u.String(), true
 }
